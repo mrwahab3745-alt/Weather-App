@@ -12,7 +12,7 @@ export default function SearchBar({ onSearch, onUseLocation, loading }) {
   };
 
   return (
-    <div className="search-bar">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
       <form onSubmit={handleSubmit} className="search-form">
         <input
           type="text"
