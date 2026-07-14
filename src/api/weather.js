@@ -5,7 +5,7 @@
 const API_KEY =
   import.meta.env.VITE_OWM_API_KEY || "2b4a5f1ec7b9e476c5d84f7fba5d32ca";
 
-const BASE_URL = "https://api.const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&_=${new Date().getTime()}`;.org/data/2.5/weather";
+const BASE_URL = "https://api.const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${2b4a5f1ec7b9e476c5d84f7fba5d32ca}&units=metric&_=${new Date().getTime()}`;.org/data/2.5/weather";
 
 export async function fetchWeatherByCity(city) {
   const url = `${BASE_URL}?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
