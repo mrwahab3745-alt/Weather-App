@@ -21,7 +21,7 @@ export default function App() {
       const data = await fetchWeatherByCity(city);
       setWeather(data);
     } catch (err) {
-      setError(err.message || "Failed to fetch weather");
+      setError(err?.message || String(err) || "Failed to fetch weather");
       setWeather(null);
     } finally {
       setLoading(false);
@@ -35,7 +35,7 @@ export default function App() {
       const data = await fetchWeatherByCoords(lat, lon);
       setWeather(data);
     } catch (err) {
-      setError(err.message || "Failed to fetch weather");
+      setError(err?.message || String(err) || "Failed to fetch weather");
       setWeather(null);
     } finally {
       setLoading(false);
