@@ -67,8 +67,8 @@ export default function App() {
     <div className="app">
       <div className="container">
         <header className="app__header">
-          <h1>Mosam Wala Bhai😎😋</h1>
-          <p>🎤In bheegi bheegi sarko pr mai kis ka intazaar karu😂</p>
+          <h1>Atmospher.io</h1>
+          {/* <p>🎤In bheegi bheegi sarko pr mai kis ka intazaar karu😂</p> */}
           <p>Real-time weather powered by OpenWeatherMap</p>
         </header>
 
