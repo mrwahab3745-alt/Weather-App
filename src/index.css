@@ -60,3 +60,5 @@ input {
   font-family: inherit;
   font-size: 1em;
 }
+
+@tailwind utilities;

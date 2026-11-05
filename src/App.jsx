@@ -4,6 +4,10 @@ import WeatherCard from "./components/WeatherCard";
 import Loader from "./components/Loader";
 import ErrorMessage from "./components/ErrorMessage";
 import Forecast from './components/Forecast';
+import TrainTransition from "./components/TrainTransition";
+import StormScatter from "./components/StormScatter";
+import RainEffect from './components/RainEffect';
+import SunEffect from './components/SunEffect';
 import {
   fetchWeatherByCity,
   fetchWeatherByCoords,
@@ -11,20 +15,20 @@ import {
 import "./App.css";
 
 export default function App() {
-  const [weather, setWeather] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [forecast, setForecast] = useState(null);
+  const [forecast] = useState(null);
 
   const loadByCity = async (city) => {
     setLoading(true);
     setError(null);
     try {
       const data = await fetchWeatherByCity(city);
-      setWeather(data);
+      setWeatherData(data);
     } catch (err) {
       setError(err?.message || String(err) || "Failed to fetch weather");
-      setWeather(null);
+      setWeatherData(null);
     } finally {
       setLoading(false);
     }
@@ -35,10 +39,10 @@ export default function App() {
     setError(null);
     try {
       const data = await fetchWeatherByCoords(lat, lon);
-      setWeather(data);
+      setWeatherData(data);
     } catch (err) {
       setError(err?.message || String(err) || "Failed to fetch weather");
-      setWeather(null);
+      setWeatherData(null);
     } finally {
       setLoading(false);
     }
@@ -81,11 +85,19 @@ export default function App() {
 
         {error && <ErrorMessage message={error} />}
 
-        {loading && !weather && <Loader />}
+        {loading && !weatherData && <Loader />}
 
-        {weather && <WeatherCard data={weather} />}
+        <RainEffect condition={weatherData?.weather?.[0]?.main} />
+        <SunEffect condition={weatherData?.weather?.[0]?.main} />
 
-        {forecast && <Forecast forecastData={forecast} />}
+        {(weatherData || forecast) && (
+          <TrainTransition activeKey={weatherData?.name || "default"}>
+            <StormScatter isWindy={weatherData?.wind?.speed > 10}>
+              {weatherData && <WeatherCard data={weatherData} />}
+              {forecast && <Forecast forecastData={forecast} />}
+            </StormScatter>
+          </TrainTransition>
+        )}
 
         <footer className="app__footer">
         </footer>

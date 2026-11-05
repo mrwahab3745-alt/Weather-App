@@ -1,36 +1,101 @@
 // OpenWeatherMap API Base URL & Key setup
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
-const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+const API_KEY = import.meta.env.VITE_WEATHER_API_KEY?.trim() ?? "";
+const API_KEY_PLACEHOLDER = /^(your_key_here|my_api_key_here)$/i;
 
-// Key check helper
-const checkApiKey = () => {
-  if (!API_KEY || API_KEY === "your_key_here") {
-    throw new Error("API Key missing! Please configure VITE_WEATHER_API_KEY in your .env file.");
-  }
+const MOCK_WEATHER = {
+  coord: { lon: 74.3587, lat: 31.5204 },
+  weather: [{ id: 800, main: "Clear", description: "clear sky", icon: "01d" }],
+  base: "stations",
+  main: {
+    temp: 27,
+    feels_like: 27,
+    temp_min: 25,
+    temp_max: 29,
+    pressure: 1012,
+    humidity: 45,
+  },
+  visibility: 10000,
+  wind: { speed: 12, deg: 240 },
+  clouds: { all: 0 },
+  sys: { country: "PK" },
+  timezone: 18000,
+  name: "Lahore",
 };
+
+function hasUsableApiKey() {
+  return API_KEY.length > 0 && !API_KEY_PLACEHOLDER.test(API_KEY);
+}
+
+function getMockWeather(reason) {
+  console.warn(`Using mock weather data: ${reason}.`);
+  const now = Math.floor(Date.now() / 1000);
+  const localDate = new Date((now + MOCK_WEATHER.timezone) * 1000)
+    .toISOString()
+    .slice(0, 10);
+  const localMidnight = Date.parse(`${localDate}T00:00:00Z`) / 1000 -
+    MOCK_WEATHER.timezone;
+
+  return {
+    ...MOCK_WEATHER,
+    main: { ...MOCK_WEATHER.main },
+    weather: MOCK_WEATHER.weather.map((condition) => ({ ...condition })),
+    sys: {
+      ...MOCK_WEATHER.sys,
+      sunrise: localMidnight + 6 * 60 * 60,
+      sunset: localMidnight + 18 * 60 * 60,
+    },
+    wind: { ...MOCK_WEATHER.wind },
+    clouds: { ...MOCK_WEATHER.clouds },
+    dt: now,
+  };
+}
+
+function getMockForecast(reason) {
+  console.warn(`Using mock forecast data: ${reason}.`);
+  const now = new Date();
+  const list = Array.from({ length: 5 }, (_, index) => {
+    const forecastDate = new Date(now);
+    forecastDate.setUTCDate(forecastDate.getUTCDate() + index + 1);
+    forecastDate.setUTCHours(12, 0, 0, 0);
+
+    return {
+      dt: Math.floor(forecastDate.getTime() / 1000),
+      dt_txt: forecastDate.toISOString().replace("T", " ").slice(0, 19),
+      main: { temp: 27 - index, feels_like: 26 - index },
+      weather: MOCK_WEATHER.weather.map((condition) => ({ ...condition })),
+    };
+  });
+
+  return { cod: "200", message: 0, cnt: list.length, list };
+}
+
+async function fetchWeather(url, requestDescription) {
+  if (!hasUsableApiKey()) {
+    return getMockWeather("VITE_WEATHER_API_KEY is missing or is a placeholder");
+  }
+
+  const res = await fetch(url);
+  if (res.status === 401 || res.status === 404) {
+    return getMockWeather(`${requestDescription} returned HTTP ${res.status}`);
+  }
+  if (!res.ok) {
+    throw new Error("Server error. Please try again later.");
+  }
+
+  return res.json();
+}
 
 // 1. City se Weather Mangaana
 export async function fetchWeatherByCity(city) {
-  checkApiKey();
   const url = `${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
-  
-  const res = await fetch(url);
-  if (!res.ok) {
-    if (res.status === 404) throw new Error("City not found. Please check spelling.");
-    if (res.status === 401) throw new Error("Invalid API key. Check OpenWeatherMap account.");
-    throw new Error("Server error. Please try again later.");
-  }
-  return res.json();
+  return fetchWeather(url, "Weather request");
 }
 
 // 2. Coordinates (Latitude/Longitude) se Weather Mangaana
 export async function fetchWeatherByCoords(lat, lon) {
-  checkApiKey();
   const url = `${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
-  
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Unable to fetch location weather.");
-  return res.json();
+  return fetchWeather(url, "Location weather request");
 }
 
 // 3. Weather Icon Helper
@@ -39,9 +104,15 @@ export function getWeatherIconUrl(iconCode) {
 }
 // 5-Day Forecast Data Fetcher
 export async function fetchForecastByCity(city) {
-  checkApiKey();
   const url = `${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
+  if (!hasUsableApiKey()) {
+    return getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder");
+  }
+
   const res = await fetch(url);
+  if (res.status === 401 || res.status === 404) {
+    return getMockForecast(`Forecast request returned HTTP ${res.status}`);
+  }
   if (!res.ok) throw new Error("Unable to fetch forecast data.");
   return res.json();
 }
