@@ -51,7 +51,9 @@ export default function App() {
         {(weatherData || forecast) && (
           <TrainTransition activeKey={weatherData?.name || "default"}>
             <StormScatter isWindy={weatherData?.wind?.speed > 10}>
-              {weatherData && <WeatherCard data={weatherData} />}
+              {weatherData && (
+                <WeatherCard data={weatherData} isNight={isNight} />
+              )}
               <Forecast forecastData={forecast} error={forecastError} />
             </StormScatter>
           </TrainTransition>

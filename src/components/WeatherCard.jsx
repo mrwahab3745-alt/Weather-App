@@ -1,4 +1,5 @@
-import { getWeatherIconUrl } from "../api/weather";
+import WeatherIcon from "./WeatherIcon";
+import { formatWeatherDescription } from "../utils/weather";
 
 function formatTime(timestamp, timezoneOffset) {
   // OpenWeatherMap returns UTC seconds; adjust by location timezone offset (also seconds)
@@ -6,7 +7,7 @@ function formatTime(timestamp, timezoneOffset) {
   return local.toUTCString().replace(" GMT", "");
 }
 
-export default function WeatherCard({ data }) {
+export default function WeatherCard({ data, isNight }) {
   if (!data) return null;
 
   const {
@@ -22,7 +23,6 @@ export default function WeatherCard({ data }) {
   } = data;
 
   const condition = weather?.[0];
-  const iconUrl = condition ? getWeatherIconUrl(condition.icon) : null;
 
   return (
     <div className="weather-card">
@@ -36,10 +36,12 @@ export default function WeatherCard({ data }) {
             Local time: {formatTime(dt, timezone)}
           </p>
         </div>
-        {iconUrl && (
-          <img
-            src={iconUrl}
-            alt={condition.description}
+        {condition && (
+          <WeatherIcon
+            conditionId={condition.id}
+            description={condition.description}
+            isNight={isNight}
+            size={96}
             className="weather-card__icon"
           />
         )}
@@ -48,7 +50,9 @@ export default function WeatherCard({ data }) {
       <div className="weather-card__main">
         <div className="weather-card__temp">{Math.round(temp)}°C</div>
         <div className="weather-card__condition">
-          <p className="weather-card__description">{condition?.description}</p>
+          <p className="weather-card__description">
+            {formatWeatherDescription(condition?.description)}
+          </p>
           <p className="weather-card__feels">
             Feels like {Math.round(feels_like)}°C
           </p>

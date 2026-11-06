@@ -1,5 +1,6 @@
 import React from 'react';
-import { getWeatherIconUrl } from '../api/weather';
+import WeatherIcon from "./WeatherIcon";
+import { formatWeatherDescription } from "../utils/weather";
 
 export default function Forecast({ forecastData, error: forecastError }) {
   if ((!forecastData || !forecastData.list) && !forecastError) return null;
@@ -59,16 +60,17 @@ export default function Forecast({ forecastData, error: forecastError }) {
                 className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl flex flex-col items-center justify-between text-white hover:bg-white/20 transition-all duration-300"
               >
                 <p className="text-sm font-medium opacity-80">{dateLabel}</p>
-                <img
-                  src={getWeatherIconUrl(condition?.icon)}
-                  alt={condition?.description ?? 'Weather condition'}
-                  className="w-12 h-12 my-1"
+                <WeatherIcon
+                  conditionId={condition?.id}
+                  description={condition?.description}
+                  size={48}
+                  className="my-1"
                 />
                 <p className="text-lg font-bold">
                   {Math.round(day.min)}° / {Math.round(day.max)}°C
                 </p>
                 <p className="text-xs capitalize text-center opacity-75">
-                  {condition?.description}
+                  {formatWeatherDescription(condition?.description)}
                 </p>
               </div>
             );

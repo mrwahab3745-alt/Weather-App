@@ -155,10 +155,6 @@ export async function fetchWeatherByCoords(lat, lon, options) {
   );
 }
 
-// 3. Weather Icon Helper
-export function getWeatherIconUrl(iconCode) {
-  return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-}
 // 5-Day Forecast Data Fetcher
 export async function fetchForecastByCity(city, options) {
   const url = `${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
