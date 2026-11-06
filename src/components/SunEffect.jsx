@@ -16,14 +16,14 @@ const dustParticles = Array.from({ length: 18 }, (_, index) => ({
   delay: (index % 7) * -1.7,
 }));
 
-export default function SunEffect({ condition }) {
+export default function SunEffect({ condition, isNight }) {
   const normalizedCondition =
     typeof condition === 'string' ? condition.toLowerCase() : '';
   const isSunny =
     normalizedCondition.includes('clear') ||
     normalizedCondition.includes('sun');
 
-  if (!isSunny) return null;
+  if (!isSunny || isNight) return null;
 
   return (
     <div className="fixed inset-0 z-40 pointer-events-none overflow-hidden" aria-hidden="true">

@@ -8,6 +8,8 @@ import TrainTransition from "./components/TrainTransition";
 import StormScatter from "./components/StormScatter";
 import RainEffect from './components/RainEffect';
 import SunEffect from './components/SunEffect';
+import MoonEffect from './components/MoonEffect';
+import { isNightTime } from "./utils/daylight";
 import {
   fetchWeatherByCity,
   fetchWeatherByCoords,
@@ -69,8 +71,10 @@ export default function App() {
     loadByCity("Lahore");
   }, []);
 
+  const isNight = isNightTime(weatherData);
+
   return (
-    <div className="app">
+    <div className={`app${isNight ? " app--night" : ""}`}>
       <div className="container">
         <header className="app__header">
           <h1>Atmosphere.io</h1>
@@ -88,7 +92,8 @@ export default function App() {
         {loading && !weatherData && <Loader />}
 
         <RainEffect condition={weatherData?.weather?.[0]?.main} />
-        <SunEffect condition={weatherData?.weather?.[0]?.main} />
+        <SunEffect condition={weatherData?.weather?.[0]?.main} isNight={isNight} />
+        <MoonEffect condition={weatherData?.weather?.[0]?.main} isNight={isNight} />
 
         {(weatherData || forecast) && (
           <TrainTransition activeKey={weatherData?.name || "default"}>

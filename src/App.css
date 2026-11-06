@@ -1,4 +1,5 @@
 .app {
+  position: relative;
   background-image: url('/WeatherAPPBG.jpg');
   background-size: cover;
   background-position: center;
@@ -13,6 +14,25 @@
   overflow-x: hidden;
   overflow-y: auto;
 }
+
+.app--night::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(7, 14, 38, 0.32),
+    rgba(14, 24, 58, 0.2)
+  );
+}
+
+.app--night .container {
+  position: relative;
+  z-index: 2;
+}
+
 .container {
   width: 100%;
   max-width: 720px;
