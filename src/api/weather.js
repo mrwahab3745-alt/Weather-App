@@ -3,6 +3,14 @@ const BASE_URL = "https://api.openweathermap.org/data/2.5";
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY?.trim() ?? "";
 const API_KEY_PLACEHOLDER = /^(your_key_here|my_api_key_here)$/i;
 
+export class WeatherApiError extends Error {
+  constructor(message, code) {
+    super(message);
+    this.name = "WeatherApiError";
+    this.code = code;
+  }
+}
+
 const MOCK_WEATHER = {
   coord: { lon: 74.3587, lat: 31.5204 },
   weather: [{ id: 800, main: "Clear", description: "clear sky", icon: "01d" }],
@@ -70,17 +78,52 @@ function getMockForecast(reason) {
   return { cod: "200", message: 0, cnt: list.length, list };
 }
 
-async function fetchWeather(url, requestDescription) {
+async function fetchWeather(url, mockData) {
   if (!hasUsableApiKey()) {
-    return getMockWeather("VITE_WEATHER_API_KEY is missing or is a placeholder");
+    if (import.meta.env.DEV) {
+      return mockData();
+    }
+    throw new Error(
+      "VITE_WEATHER_API_KEY is missing or is a placeholder. Configure it to fetch weather data."
+    );
   }
 
-  const res = await fetch(url);
-  if (res.status === 401 || res.status === 404) {
-    return getMockWeather(`${requestDescription} returned HTTP ${res.status}`);
+  let res;
+  try {
+    res = await fetch(url);
+  } catch (error) {
+    if (error instanceof TypeError) {
+      throw new WeatherApiError(
+        "No internet connection. Please check your network.",
+        "NETWORK"
+      );
+    }
+    throw error;
+  }
+
+  if (res.status === 404) {
+    throw new WeatherApiError(
+      "City not found. Please check the spelling and try again.",
+      "NOT_FOUND"
+    );
+  }
+  if (res.status === 401) {
+    throw new WeatherApiError(
+      "Weather service is temporarily unavailable. Please try again later.",
+      "UNAUTHORIZED"
+    );
+  }
+  if (res.status === 429) {
+    throw new WeatherApiError(
+      "Too many requests. Please wait a minute and try again.",
+      "RATE_LIMITED"
+    );
   }
   if (!res.ok) {
-    throw new Error("Server error. Please try again later.");
+    throw new WeatherApiError(
+      "Server error. Please try again later.",
+      "SERVER"
+    );
   }
 
   return res.json();
@@ -89,13 +132,17 @@ async function fetchWeather(url, requestDescription) {
 // 1. City se Weather Mangaana
 export async function fetchWeatherByCity(city) {
   const url = `${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
-  return fetchWeather(url, "Weather request");
+  return fetchWeather(url, () =>
+    getMockWeather("VITE_WEATHER_API_KEY is missing or is a placeholder")
+  );
 }
 
 // 2. Coordinates (Latitude/Longitude) se Weather Mangaana
 export async function fetchWeatherByCoords(lat, lon) {
   const url = `${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
-  return fetchWeather(url, "Location weather request");
+  return fetchWeather(url, () =>
+    getMockWeather("VITE_WEATHER_API_KEY is missing or is a placeholder")
+  );
 }
 
 // 3. Weather Icon Helper
@@ -105,14 +152,7 @@ export function getWeatherIconUrl(iconCode) {
 // 5-Day Forecast Data Fetcher
 export async function fetchForecastByCity(city) {
   const url = `${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
-  if (!hasUsableApiKey()) {
-    return getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder");
-  }
-
-  const res = await fetch(url);
-  if (res.status === 401 || res.status === 404) {
-    return getMockForecast(`Forecast request returned HTTP ${res.status}`);
-  }
-  if (!res.ok) throw new Error("Unable to fetch forecast data.");
-  return res.json();
+  return fetchWeather(url, () =>
+    getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder")
+  );
 }

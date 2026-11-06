@@ -11,10 +11,15 @@ cd weather-app
 npm install
 ```
 
-Add your OpenWeatherMap API key in one of two ways:
+Add your OpenWeatherMap API key by copying `.env.example` to `.env` and
+setting `VITE_WEATHER_API_KEY` to your key:
 
-1. Copy `.env.example` to `.env` and set `VITE_OWM_API_KEY=your_key_here`, or
-2. Edit `src/api/weather.js` and replace the placeholder string.
+```env
+VITE_WEATHER_API_KEY=your_key_here
+```
+
+In development, the app uses sample weather only while this key is missing or
+still set to the placeholder. Production builds require a usable key.
 
 Then start the dev server:
 
@@ -63,8 +68,7 @@ weather-app/
 
 ## Notes
 
-- The first screen loads London by default. Once you supply a valid API key,
-  replace the placeholder in `src/api/weather.js` (or use `.env`) and search
-  for any city.
+- The first screen loads Lahore by default. Configure a valid API key in `.env`
+  and search for any city.
 - Free OpenWeatherMap keys can take a few minutes to an hour to activate
   after creation.
