@@ -75,7 +75,13 @@ function getMockForecast(reason) {
     };
   });
 
-  return { cod: "200", message: 0, cnt: list.length, list };
+  return {
+    cod: "200",
+    message: 0,
+    cnt: list.length,
+    list,
+    city: { timezone: MOCK_WEATHER.timezone },
+  };
 }
 
 async function fetchWeather(url, mockData) {
@@ -152,6 +158,13 @@ export function getWeatherIconUrl(iconCode) {
 // 5-Day Forecast Data Fetcher
 export async function fetchForecastByCity(city) {
   const url = `${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
+  return fetchWeather(url, () =>
+    getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder")
+  );
+}
+
+export async function fetchForecastByCoords(lat, lon) {
+  const url = `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
   return fetchWeather(url, () =>
     getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder")
   );

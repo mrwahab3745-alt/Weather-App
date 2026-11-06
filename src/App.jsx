@@ -13,6 +13,8 @@ import { isNightTime } from "./utils/daylight";
 import {
   fetchWeatherByCity,
   fetchWeatherByCoords,
+  fetchForecastByCity,
+  fetchForecastByCoords,
 } from "./api/weather";
 import "./App.css";
 
@@ -20,34 +22,47 @@ export default function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [forecast] = useState(null);
+  const [forecast, setForecast] = useState(null);
+  const [forecastError, setForecastError] = useState(null);
 
-  const loadByCity = async (city) => {
+  const loadWeatherAndForecast = async (weatherRequest, forecastRequest) => {
     setLoading(true);
     setError(null);
+    setForecastError(null);
     try {
-      const data = await fetchWeatherByCity(city);
-      setWeatherData(data);
+      const [weatherResult, forecastResult] = await Promise.all([
+        weatherRequest,
+        forecastRequest
+          .then((data) => ({ data }))
+          .catch((forecastFailure) => ({ error: forecastFailure })),
+      ]);
+      setWeatherData(weatherResult);
+      setForecast(forecastResult.data ?? null);
+      setForecastError(
+        forecastResult.error?.message ??
+          (forecastResult.error ? "Unable to load forecast data." : null)
+      );
     } catch (err) {
       setError(err?.message || String(err) || "Failed to fetch weather");
       setWeatherData(null);
+      setForecast(null);
+      setForecastError(null);
     } finally {
       setLoading(false);
     }
   };
 
+  const loadByCity = (city) =>
+    loadWeatherAndForecast(
+      fetchWeatherByCity(city),
+      fetchForecastByCity(city)
+    );
+
   const loadByCoords = async (lat, lon) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchWeatherByCoords(lat, lon);
-      setWeatherData(data);
-    } catch (err) {
-      setError(err?.message || String(err) || "Failed to fetch weather");
-      setWeatherData(null);
-    } finally {
-      setLoading(false);
-    }
+    return loadWeatherAndForecast(
+      fetchWeatherByCoords(lat, lon),
+      fetchForecastByCoords(lat, lon)
+    );
   };
 
   const handleUseLocation = () => {
@@ -99,7 +114,7 @@ export default function App() {
           <TrainTransition activeKey={weatherData?.name || "default"}>
             <StormScatter isWindy={weatherData?.wind?.speed > 10}>
               {weatherData && <WeatherCard data={weatherData} />}
-              {forecast && <Forecast forecastData={forecast} />}
+              <Forecast forecastData={forecast} error={forecastError} />
             </StormScatter>
           </TrainTransition>
         )}
