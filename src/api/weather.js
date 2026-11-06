@@ -84,7 +84,7 @@ function getMockForecast(reason) {
   };
 }
 
-async function fetchWeather(url, mockData) {
+async function fetchWeather(url, mockData, { signal } = {}) {
   if (!hasUsableApiKey()) {
     if (import.meta.env.DEV) {
       return mockData();
@@ -96,7 +96,7 @@ async function fetchWeather(url, mockData) {
 
   let res;
   try {
-    res = await fetch(url);
+    res = await fetch(url, { signal });
   } catch (error) {
     if (error instanceof TypeError) {
       throw new WeatherApiError(
@@ -136,18 +136,22 @@ async function fetchWeather(url, mockData) {
 }
 
 // 1. City se Weather Mangaana
-export async function fetchWeatherByCity(city) {
+export async function fetchWeatherByCity(city, options) {
   const url = `${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
-  return fetchWeather(url, () =>
-    getMockWeather("VITE_WEATHER_API_KEY is missing or is a placeholder")
+  return fetchWeather(
+    url,
+    () => getMockWeather("VITE_WEATHER_API_KEY is missing or is a placeholder"),
+    options
   );
 }
 
 // 2. Coordinates (Latitude/Longitude) se Weather Mangaana
-export async function fetchWeatherByCoords(lat, lon) {
+export async function fetchWeatherByCoords(lat, lon, options) {
   const url = `${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
-  return fetchWeather(url, () =>
-    getMockWeather("VITE_WEATHER_API_KEY is missing or is a placeholder")
+  return fetchWeather(
+    url,
+    () => getMockWeather("VITE_WEATHER_API_KEY is missing or is a placeholder"),
+    options
   );
 }
 
@@ -156,16 +160,20 @@ export function getWeatherIconUrl(iconCode) {
   return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 }
 // 5-Day Forecast Data Fetcher
-export async function fetchForecastByCity(city) {
+export async function fetchForecastByCity(city, options) {
   const url = `${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`;
-  return fetchWeather(url, () =>
-    getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder")
+  return fetchWeather(
+    url,
+    () => getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder"),
+    options
   );
 }
 
-export async function fetchForecastByCoords(lat, lon) {
+export async function fetchForecastByCoords(lat, lon, options) {
   const url = `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
-  return fetchWeather(url, () =>
-    getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder")
+  return fetchWeather(
+    url,
+    () => getMockForecast("VITE_WEATHER_API_KEY is missing or is a placeholder"),
+    options
   );
 }
