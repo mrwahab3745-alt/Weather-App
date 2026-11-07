@@ -7,25 +7,31 @@ Forecast APIs.
 
 ## Quick start
 
+Install dependencies:
+
 ```bash
-git clone https://github.com/mrwahab3745-alt/Weather-App.git
-cd Weather-App
 npm install
 ```
 
-Copy `.env.example` to `.env` and set your OpenWeatherMap API key:
-
-```env
-VITE_WEATHER_API_KEY=your_key_here
-```
-
-Start the development server:
+Copy `.env.example` to `.env` and add your OpenWeatherMap API key to
+`OPENWEATHER_API_KEY`. This key is server-side only; do not rename it with a
+`VITE_` prefix.
 
 ```bash
-npm run dev
+cp .env.example .env
 ```
 
-Vite prints the local URL (usually `http://localhost:5173`).
+Run the app with Netlify Functions enabled:
+
+```bash
+npx netlify-cli dev
+```
+
+Open the URL printed by the command. Plain `npm run dev` starts only the Vite
+development server and does not serve the Netlify Function.
+
+To work locally with sample data and without an API key, set
+`VITE_USE_MOCK=true` in `.env`.
 
 ## Features
 
@@ -36,53 +42,76 @@ Vite prints the local URL (usually `http://localhost:5173`).
 - Loading indicators and clear error states for API and network failures.
 - Responsive layout.
 
-The app loads Lahore by default. In development, sample weather is used only
-when the API key is missing or still set to the placeholder. Production builds
-require a usable key.
+The app loads Lahore by default.
 
 ## Project structure
 
 ```
-Weather-App/
+Atmosphere.io/
 ├── .env.example
+├── .gitignore
 ├── index.html
 ├── package.json
-└── src/
-    ├── App.css
-    ├── App.jsx
-    ├── index.css
-    ├── main.jsx
-    ├── api/
-    │   └── weather.js
-    ├── assets/
-    │   ├── hero.png
-    │   ├── react.svg
-    │   └── vite.svg
-    ├── components/
-    │   ├── ErrorMessage.jsx
-    │   ├── Forecast.jsx
-    │   ├── Loader.jsx
-    │   ├── MoonEffect.jsx
-    │   ├── RainEffect.jsx
-    │   ├── SearchBar.jsx
-    │   ├── StormScatter.jsx
-    │   ├── SunEffect.jsx
-    │   ├── TrainTransition.jsx
-    │   └── WeatherCard.jsx
-    └── utils/
-        └── daylight.js
+├── package-lock.json
+├── netlify.toml
+├── netlify/
+│   ├── functions/
+│   │   └── weather.mjs
+│   └── lib/
+│       ├── validate.mjs
+│       └── validate.test.mjs
+├── src/
+│   ├── App.css
+│   ├── App.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   ├── api/
+│   │   ├── mock.js
+│   │   └── weather.js
+│   ├── assets/
+│   │   ├── hero.png
+│   │   ├── react.svg
+│   │   └── vite.svg
+│   ├── components/
+│   │   ├── ErrorMessage.jsx
+│   │   ├── Forecast.jsx
+│   │   ├── Loader.jsx
+│   │   ├── MoonEffect.jsx
+│   │   ├── RainEffect.jsx
+│   │   ├── SearchBar.jsx
+│   │   ├── StormScatter.jsx
+│   │   ├── SunEffect.jsx
+│   │   ├── TrainTransition.jsx
+│   │   ├── WeatherCard.jsx
+│   │   └── WeatherIcon.jsx
+│   ├── hooks/
+│   │   └── useWeather.js
+│   └── utils/
+│       ├── daylight.js
+│       └── weather.js
+├── tailwind.config.js
+└── vite.config.js
 ```
 
 ## Scripts
 
-- `npm run dev` — start the development server
+- `npm run dev` — start the Vite development server (does not serve Netlify Functions)
+- `npx netlify-cli dev` — run the app with Netlify Functions locally
 - `npm run build` — build for production
 - `npm run preview` — preview the production build locally
 - `npm run lint` — run the linter
+- `npm test` — run the validation tests
+
+## Testing
+
+Run the test suite with:
+
+```bash
+npm test
+```
 
 ## Security note
 
-Vite bundles environment variables prefixed with `VITE_` into browser
-JavaScript, so this API key is visible to users. A planned improvement is to
-proxy OpenWeatherMap requests through a Netlify Function so the key can remain
-server-side.
+The OpenWeatherMap API key lives only in Netlify environment variables and is
+read server-side by the Netlify Function; it is never sent to the browser.
+Requests are validated, cached, and error-sanitised by the function.
