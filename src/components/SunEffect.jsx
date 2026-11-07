@@ -28,10 +28,8 @@ export default function SunEffect({ condition, isNight }) {
   return (
     <div className="fixed inset-0 z-40 pointer-events-none overflow-hidden" aria-hidden="true">
       <motion.div
-        className="absolute h-[130vmax] w-[130vmax] rounded-full"
+        className="sun-effect__rays absolute rounded-full"
         style={{
-          top: 'calc(4rem - 65vmax)',
-          left: 'calc(100% - 4rem - 65vmax)',
           transformOrigin: 'center',
           background:
             'conic-gradient(from 0deg, transparent 0deg, rgba(255,235,150,0.12) 9deg, transparent 18deg, rgba(255,211,105,0.2) 32deg, transparent 44deg, rgba(255,245,190,0.12) 58deg, transparent 72deg, rgba(255,211,105,0.18) 88deg, transparent 104deg, rgba(255,235,150,0.14) 122deg, transparent 140deg, rgba(255,211,105,0.2) 158deg, transparent 176deg, rgba(255,245,190,0.12) 194deg, transparent 212deg, rgba(255,211,105,0.18) 230deg, transparent 248deg, rgba(255,235,150,0.14) 266deg, transparent 284deg, rgba(255,211,105,0.2) 302deg, transparent 320deg, rgba(255,245,190,0.12) 338deg, transparent 360deg)',

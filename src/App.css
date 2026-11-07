@@ -33,6 +33,15 @@
   z-index: 2;
 }
 
+.sun-effect__rays {
+  --sun-rays-size: 130vmax;
+  --sun-rays-radius: 65vmax;
+  width: var(--sun-rays-size);
+  height: var(--sun-rays-size);
+  top: calc(4rem - var(--sun-rays-radius));
+  left: calc(100% - 4rem - var(--sun-rays-radius));
+}
+
 .container {
   width: 100%;
   max-width: 720px;
@@ -50,12 +59,13 @@
   margin: 0;
   font-size: clamp(2rem, 5vw, 3rem);
   letter-spacing: 0.5px;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.32);
 }
 
 .app__header p {
   margin: 0.5rem 0 0;
   opacity: 0.85;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }
 
 .search-bar {
@@ -259,6 +269,11 @@
 }
 
 @media (max-width: 480px) {
+  .sun-effect__rays {
+    --sun-rays-size: clamp(20rem, 90vmin, 32rem);
+    --sun-rays-radius: clamp(10rem, 45vmin, 16rem);
+  }
+
   .weather-card__main {
     flex-direction: column;
     align-items: flex-start;
