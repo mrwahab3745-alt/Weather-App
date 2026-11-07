@@ -65,6 +65,7 @@ export default function Forecast({ forecastData, error: forecastError }) {
                   description={condition?.description}
                   size={48}
                   className="my-1"
+                  variant="onGlass"
                 />
                 <p className="text-lg font-bold">
                   {Math.round(day.min)}° / {Math.round(day.max)}°C
