@@ -23,7 +23,7 @@ export default function MoonEffect({ condition, isNight }) {
       {stars.map((star, index) => (
         <motion.div
           key={`star-${index}`}
-          className="absolute rounded-full bg-white shadow-[0_0_8px_2px_rgba(219,234,254,0.75)]"
+          className="absolute rounded-full bg-white shadow-[0_0_8px_2px_rgba(219,234,254,0.9)]"
           style={{
             top: star.top,
             left: star.left,
@@ -31,7 +31,7 @@ export default function MoonEffect({ condition, isNight }) {
             height: star.size,
           }}
           animate={{
-            opacity: [0.25, 1, 0.25],
+            opacity: [0.4, 1, 0.4],
             scale: [0.75, 1.2, 0.75],
           }}
           transition={{
@@ -44,11 +44,11 @@ export default function MoonEffect({ condition, isNight }) {
       ))}
 
       <motion.div
-        className="absolute right-8 top-8 h-28 w-28 rounded-full bg-gradient-to-br from-white via-blue-100 to-slate-300 shadow-[0_0_35px_16px_rgba(191,219,254,0.35),0_0_110px_55px_rgba(129,165,220,0.16)]"
+        className="absolute right-8 top-8 h-28 w-28 rounded-full bg-gradient-to-br from-white via-white to-blue-100 shadow-[0_0_38px_18px_rgba(219,234,254,0.5),0_0_120px_58px_rgba(147,197,253,0.22)]"
         animate={{ opacity: [0.88, 1, 0.88], scale: [1, 1.03, 1] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
-        <div className="absolute inset-4 rounded-full bg-gradient-to-br from-white/70 to-slate-300/20" />
+        <div className="absolute inset-4 rounded-full bg-gradient-to-br from-white/90 to-blue-100/30" />
       </motion.div>
     </div>
   );
