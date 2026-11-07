@@ -1,3 +1,4 @@
+import { useState } from "react";
 import SearchBar from "./components/SearchBar";
 import WeatherCard from "./components/WeatherCard";
 import Loader from "./components/Loader";
@@ -20,9 +21,11 @@ export default function App() {
     loading,
     error,
     searchCity,
+    searchCoords,
     searchLocation,
     retry,
   } = useWeather();
+  const [selectedPlaceLabel, setSelectedPlaceLabel] = useState("");
 
   const isNight = isNightTime(weatherData);
 
@@ -35,8 +38,19 @@ export default function App() {
         </header>
 
         <SearchBar
-          onSearch={searchCity}
-          onUseLocation={searchLocation}
+          onSearch={(city) => {
+            setSelectedPlaceLabel("");
+            searchCity(city);
+          }}
+          onSelectPlace={(place) => {
+            const label = [place.name, place.region].filter(Boolean).join(", ");
+            setSelectedPlaceLabel(label);
+            searchCoords(place.lat, place.lon);
+          }}
+          onUseLocation={() => {
+            setSelectedPlaceLabel("");
+            searchLocation();
+          }}
           loading={loading}
         />
 
@@ -52,7 +66,11 @@ export default function App() {
           <TrainTransition activeKey={weatherData?.name || "default"}>
             <StormScatter isWindy={weatherData?.wind?.speed > 10}>
               {weatherData && (
-                <WeatherCard data={weatherData} isNight={isNight} />
+                <WeatherCard
+                  data={weatherData}
+                  isNight={isNight}
+                  cityLabel={selectedPlaceLabel}
+                />
               )}
               <Forecast forecastData={forecast} error={forecastError} />
             </StormScatter>

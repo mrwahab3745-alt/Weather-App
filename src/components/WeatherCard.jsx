@@ -2,7 +2,7 @@ import WeatherIcon from "./WeatherIcon";
 import { formatWeatherDescription } from "../utils/weather";
 import { formatClockTime, formatLocalDateTime } from "../utils/time";
 
-export default function WeatherCard({ data, isNight }) {
+export default function WeatherCard({ data, isNight, cityLabel }) {
   if (!data) return null;
 
   const {
@@ -24,8 +24,10 @@ export default function WeatherCard({ data, isNight }) {
       <div className="weather-card__header">
         <div>
           <h2 className="weather-card__city">
-            {name}
-            {country ? <span className="weather-card__country">, {country}</span> : null}
+            {cityLabel || name}
+            {!cityLabel && country ? (
+              <span className="weather-card__country">, {country}</span>
+            ) : null}
           </h2>
           <p className="weather-card__time">
             Local time: {formatLocalDateTime(dt, timezone)}
