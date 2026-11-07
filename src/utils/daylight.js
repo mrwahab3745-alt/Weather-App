@@ -1,5 +1,11 @@
 export function isNightTime(data) {
   const { dt, sys, weather } = data ?? {};
+  const icon = weather?.[0]?.icon;
+
+  if (typeof icon === "string" && icon.length > 0) {
+    return icon.endsWith("n");
+  }
+
   const sunrise = sys?.sunrise;
   const sunset = sys?.sunset;
 
@@ -11,6 +17,5 @@ export function isNightTime(data) {
     return dt < sunrise || dt > sunset;
   }
 
-  const icon = weather?.[0]?.icon;
-  return typeof icon === "string" && icon.endsWith("n");
+  return false;
 }
