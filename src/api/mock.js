@@ -18,6 +18,43 @@ const MOCK_WEATHER = {
   name: "Lahore",
 };
 
+const MOCK_PLACES = [
+  {
+    id: 1161991,
+    name: "Rahim Yar Khan",
+    region: "Punjab",
+    country: "Pakistan",
+    countryCode: "PK",
+    lat: 28.42,
+    lon: 70.3,
+  },
+  {
+    id: 1172451,
+    name: "Lahore",
+    region: "Punjab",
+    country: "Pakistan",
+    countryCode: "PK",
+    lat: 31.55,
+    lon: 74.34,
+  },
+  {
+    id: 1174872,
+    name: "Karachi",
+    region: "Sindh",
+    country: "Pakistan",
+    countryCode: "PK",
+    lat: 24.86,
+    lon: 67.01,
+  },
+];
+
+export function getMockPlaces(query) {
+  const normalizedQuery = query.toLocaleLowerCase();
+  return MOCK_PLACES.filter((place) =>
+    place.name.toLocaleLowerCase().includes(normalizedQuery),
+  );
+}
+
 export function getMockWeather() {
   console.warn("Using mock weather data.");
   const now = Math.floor(Date.now() / 1000);
