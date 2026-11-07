@@ -33,6 +33,7 @@ export default function useWeather() {
   const [forecastError, setForecastError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [errorCode, setErrorCode] = useState(null);
   const controllerRef = useRef(null);
   const lastRequestRef = useRef(null);
 
@@ -43,6 +44,7 @@ export default function useWeather() {
     lastRequestRef.current = request;
     setLoading(true);
     setError(null);
+    setErrorCode(null);
     setForecastError(null);
     return controller;
   }, []);
@@ -70,6 +72,7 @@ export default function useWeather() {
           return;
         }
         setError(getErrorMessage(requestError));
+        setErrorCode(requestError?.code ?? null);
         setWeatherData(null);
         setForecast(null);
         setForecastError(null);
@@ -164,6 +167,7 @@ export default function useWeather() {
     forecastError,
     loading,
     error,
+    errorCode,
     searchCity,
     searchCoords,
     searchLocation,

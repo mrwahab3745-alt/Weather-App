@@ -20,6 +20,7 @@ export default function App() {
     forecastError,
     loading,
     error,
+    errorCode,
     searchCity,
     searchCoords,
     searchLocation,
@@ -54,7 +55,16 @@ export default function App() {
           loading={loading}
         />
 
-        {error && <ErrorMessage message={error} onRetry={retry} />}
+        {error && (
+          <ErrorMessage
+            message={error}
+            onRetry={
+              ["NETWORK", "SERVER", "RATE_LIMITED"].includes(errorCode)
+                ? retry
+                : undefined
+            }
+          />
+        )}
 
         {loading && !weatherData && <Loader />}
 
