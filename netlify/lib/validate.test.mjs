@@ -70,3 +70,28 @@ test("rejects unknown and repeated query parameters", () => {
   assert.equal(parse("type=weather&q=Lahore&appid=x").ok, false);
   assert.equal(parse("type=weather&type=forecast&q=Lahore").ok, false);
 });
+
+test("accepts and normalizes a valid geocoding query", () => {
+  assert.deepEqual(parse("type=geocode&q=Rahim+++Yar+khan"), {
+    ok: true,
+    endpoint: "geocode",
+    params: { q: "Rahim Yar khan" },
+  });
+});
+
+test("rejects geocoding queries shorter than two characters", () => {
+  assert.equal(parse("type=geocode&q=R").ok, false);
+});
+
+test("rejects geocoding queries longer than 80 characters", () => {
+  assert.equal(parse(`type=geocode&q=${"a".repeat(81)}`).ok, false);
+});
+
+test("rejects injection-like geocoding queries", () => {
+  assert.equal(parse("type=geocode&q=%3Cscript%3Ealert(1)%3C%2Fscript%3E").ok, false);
+  assert.equal(parse("type=geocode&q=Lahore%26appid%3Dx").ok, false);
+});
+
+test("rejects geocoding queries combined with coordinates", () => {
+  assert.equal(parse("type=geocode&q=Lahore&lat=31.5&lon=74.3").ok, false);
+});

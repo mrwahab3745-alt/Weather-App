@@ -16,13 +16,26 @@ export function parseWeatherQuery(searchParams) {
   }
 
   const type = searchParams.get("type");
-  if (type !== "weather" && type !== "forecast") {
-    return failure("Type must be weather or forecast.");
+  if (type !== "weather" && type !== "forecast" && type !== "geocode") {
+    return failure("Type must be weather, forecast, or geocode.");
   }
 
   const q = searchParams.get("q");
   const lat = searchParams.get("lat");
   const lon = searchParams.get("lon");
+
+  if (type === "geocode") {
+    if (q === null || lat !== null || lon !== null) {
+      return failure("Geocoding requires a city name only.");
+    }
+
+    const city = q.trim().replace(/\s+/gu, " ");
+    if (city.length < 2 || city.length > 80 || !CITY_PATTERN.test(city)) {
+      return failure("City must be 2-80 valid characters.");
+    }
+    return { ok: true, endpoint: type, params: { q: city } };
+  }
+
   const hasCity = q !== null;
   const hasAnyCoordinates = lat !== null || lon !== null;
 
