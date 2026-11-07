@@ -6,6 +6,7 @@ export default function Forecast({ forecastData, error: forecastError }) {
   if ((!forecastData || !forecastData.list) && !forecastError) return null;
 
   const timezone = forecastData?.city?.timezone ?? 0;
+  const today = new Date(Date.now() + timezone * 1000).toISOString().slice(0, 10);
   const dailyGroups = new Map();
   for (const item of forecastData?.list ?? []) {
     const localDateTime = new Date((item.dt + timezone) * 1000);
@@ -42,22 +43,30 @@ export default function Forecast({ forecastData, error: forecastError }) {
         </p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          {dailyForecasts.map((day) => {
+          {dailyForecasts.map((day, index) => {
             const item = day.representative;
-            const dateLabel = new Date(
-              `${day.date}T00:00:00Z`
-            ).toLocaleDateString('en-US', {
-              weekday: 'short',
-              month: 'short',
-              day: 'numeric',
-              timeZone: 'UTC',
-            });
+            const dateLabel =
+              day.date === today
+                ? "Today"
+                : new Date(`${day.date}T00:00:00Z`).toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                      timeZone: "UTC",
+                    },
+                  );
             const condition = item.weather?.[0];
 
             return (
               <div
                 key={day.date}
-                className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl flex flex-col items-center justify-between text-white hover:bg-white/20 transition-all duration-300"
+                className={`bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl flex flex-col items-center justify-between text-white hover:bg-white/20 transition-all duration-300 ${
+                  index === dailyForecasts.length - 1
+                    ? "col-span-2 sm:col-span-1"
+                    : ""
+                }`}
               >
                 <p className="text-sm font-medium opacity-80">{dateLabel}</p>
                 <WeatherIcon
