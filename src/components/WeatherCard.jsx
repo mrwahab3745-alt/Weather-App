@@ -1,11 +1,6 @@
 import WeatherIcon from "./WeatherIcon";
 import { formatWeatherDescription } from "../utils/weather";
-
-function formatTime(timestamp, timezoneOffset) {
-  // OpenWeatherMap returns UTC seconds; adjust by location timezone offset (also seconds)
-  const local = new Date((timestamp + timezoneOffset) * 1000);
-  return local.toUTCString().replace(" GMT", "");
-}
+import { formatClockTime, formatLocalDateTime } from "../utils/time";
 
 export default function WeatherCard({ data, isNight }) {
   if (!data) return null;
@@ -33,7 +28,7 @@ export default function WeatherCard({ data, isNight }) {
             {country ? <span className="weather-card__country">, {country}</span> : null}
           </h2>
           <p className="weather-card__time">
-            Local time: {formatTime(dt, timezone)}
+            Local time: {formatLocalDateTime(dt, timezone)}
           </p>
         </div>
         {condition && (
@@ -85,13 +80,13 @@ export default function WeatherCard({ data, isNight }) {
         <div className="detail">
           <span className="detail__label">Sunrise</span>
           <span className="detail__value">
-            {new Date((sunrise + timezone) * 1000).toUTCString().split(" ")[4]}
+            {formatClockTime(sunrise, timezone)}
           </span>
         </div>
         <div className="detail">
           <span className="detail__label">Sunset</span>
           <span className="detail__value">
-            {new Date((sunset + timezone) * 1000).toUTCString().split(" ")[4]}
+            {formatClockTime(sunset, timezone)}
           </span>
         </div>
       </div>
